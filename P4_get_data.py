@@ -12,6 +12,8 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
     # print len(stock_list)
     # print stock_list
     df = pd.DataFrame(columns = ['Date','Unix','Ticker','DE Ratio'])
+    sp500_df = pd.DataFrame.from_csv('ALPHAVANTAGE-INDEX.csv')
+
     for each_dir in stock_list[1:]:
         print "each_dir:"+ each_dir
         each_file = os.listdir(each_dir)
@@ -28,8 +30,25 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                 # print full_file_path
                 source = open(full_file_path, 'r').read()  #normally this will be a urllib.urlopen if this is a url
                 # print source
+
                 try:
                     value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                    try:
+                        sp500_date = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
+                        # row = sp500_df[(sp500_df['Date'] == sp500_date)]
+                        row = sp500_df[sp500_df["Date"] == sp500_date]
+                        row = sp500_df[sp500_df["Open"] <= 2000]
+                        print row
+                        sp500_value = float(row["Adj Close"])
+                    except:
+                        sp500_date = datetime.fromtimestamp(unix_time-259200).strftime('%Y-%m-%d')
+                        row = sp500_df[sp500_df["Date"] == sp500_date]
+                        print "exceptttttt!!!1", row
+                        sp500_value = float(row["Adj Close"])
+                    # print "+++++++++++++++++"
+
+                    stock_price =  float(source.split('</small><big><b>')[1].split('<b><big>')[0])
+                    print 'stock price:', stock_price, "ticker:", ticker
                     df = df.append({'Date':date_stamp,'Unix':unix_time,'Ticker':ticker,'DE Ratio':value,},ignore_index = True)
                 except Exception as e:
                     pass
