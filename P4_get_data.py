@@ -14,6 +14,7 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
     df = pd.DataFrame(columns = ['Date','Unix','Ticker','DE Ratio'])
     sp500_df = pd.DataFrame.from_csv('ALPHAVANTAGE-INDEX.csv')
 
+
     for each_dir in stock_list[1:]:
         print "each_dir:"+ each_dir
         each_file = os.listdir(each_dir)
@@ -35,15 +36,16 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                     value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
                     try:
                         sp500_date = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
+                        # print sp500_date
                         # row = sp500_df[(sp500_df['Date'] == sp500_date)]
-                        row = sp500_df[sp500_df["Date"] == sp500_date]
-                        row = sp500_df[sp500_df["Open"] <= 2000]
-                        print row
+                        row = sp500_df[(sp500_df.index == sp500_date)]
+                        # row = sp500_df[sp500_df["Open"] <= 1200]
+
                         sp500_value = float(row["Adj Close"])
                     except:
                         sp500_date = datetime.fromtimestamp(unix_time-259200).strftime('%Y-%m-%d')
-                        row = sp500_df[sp500_df["Date"] == sp500_date]
-                        print "exceptttttt!!!1", row
+                        row = sp500_df[(sp500_df.index == sp500_date)]
+                        # print "exceptttttt!!!1", row
                         sp500_value = float(row["Adj Close"])
                     # print "+++++++++++++++++"
 
