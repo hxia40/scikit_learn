@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import time
+import re
 from datetime import datetime
 
 from time import mktime
@@ -8,7 +9,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib import style
-# style.use("dark background")
+style.use("dark_background")
 
 path = "/Users/huixia/Documents/ScikitLearn/intraQuarter"
 
@@ -35,7 +36,7 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
     ticker_list = []
 
     for each_dir in stock_list[1:25]:
-        print "each_dir:"+ each_dir
+        print "\neach_dir:"+ each_dir
         each_file = os.listdir(each_dir)
         # print(each_file)
         # time.sleep(15)
@@ -57,7 +58,12 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                 # print source
 
                 try:
-                    value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                    try:
+                        value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                    except Exception as ex11:
+                        # print "ex11 passsssssssing for", ticker, file, "reason is:", str(ex11)
+                        value = float(source.split(gather + ':</td>\n<td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                        # print "passed"
                     try:
                         sp500_date = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
                         row = sp500_df[(sp500_df['Date'] == sp500_date)]
@@ -69,8 +75,18 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                         sp500_value = float(row["Adj Close"])
                         # print "+++++++++++++++++"
 
-                    stock_price = float(source.split('</small><big><b>')[1].split('</b></big>&')[0])
-                    # print 'stock price:', stock_price, "ticker:", ticker
+                    try:
+                        stock_price = float(source.split('</small><big><b>')[1].split('</b></big>&')[0])
+                        # print 'stock price:', stock_price, "ticker:", ticker
+                    except Exception as ex13:
+                        try:
+                            stock_price = (source.split('</small><big><b>')[1].split('</b></big>&')[0])
+                            stock_price = re.search(r'(\d(1,8)\.\d(1,8)',stock_price)
+                            stock_price = float(stock_price.group(1))
+                        except Exception as ex131:
+                            print "ticker:", ticker, "problem ex131:", str(ex131)
+
+                        print "ticker:", ticker, "problem ex13:", str(ex13)
 
                     if not starting_stock_value:
                         starting_stock_value = stock_price
@@ -102,17 +118,19 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
     for each_ticker in ticker_list:
         try:
             plot_df = df[(df['Ticker']) == each_ticker]
-            # print "checker 00000000", plot_df
+            # print "checker 00000000\n", plot_df
             plot_df.set_index(['Date'], inplace = True)
-            # print "checker 1111111",  plot_df
+            # print "checker 1111111\n",  plot_df
 
             plot_df['Difference'].plot(label = each_ticker)
-            # print "checker 22222222", plot_df
+            # plt.plot(plot_df['Difference'],label='Strategy Learner Portfolio', color='B')
+            # print "checker 22222222\n", plot_df
             plt.legend()
-        except Exception as f:
-            print "passsssssssing for", each_ticker, "reason is:", str(f)
+        except Exception as ex2:
+            print "ticker is:", each_ticker, "reason is:", str(ex2)
             pass
-    plt.show()
+    plt.savefig('Figure.png')
+    # plt.show()
 
     save = gather.replace(' ', '').replace(')', '').replace('(', '').replace('/', '') + str('.csv')
     print "save:", save
