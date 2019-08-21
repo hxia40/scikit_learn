@@ -59,11 +59,11 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
 
                 try:
                     try:
-                        value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                        value = float(source.replace("\n",'').split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
                     except Exception as ex11:
-                        # print "ex11 passsssssssing for", ticker, file, "reason is:", str(ex11)
-                        value = float(source.split(gather + ':</td>\n<td class="yfnc_tabledata1">')[1].split('</td>')[0])
-                        # print "passed"
+                        print "ticker:", ticker, file, "problem ex11:", str(ex11)
+                        value = float(source.split(gather + ':</td>','\n','<td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                        print "ex11 passed"
                     try:
                         sp500_date = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
                         row = sp500_df[(sp500_df['Date'] == sp500_date)]
@@ -79,14 +79,17 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                         stock_price = float(source.split('</small><big><b>')[1].split('</b></big>&')[0])
                         # print 'stock price:', stock_price, "ticker:", ticker
                     except Exception as ex13:
+                        # print "ticker:", ticker, file, "problem ex13:", str(ex13)
                         try:
                             stock_price = (source.split('</small><big><b>')[1].split('</b></big>&')[0])
-                            stock_price = re.search(r'(\d(1,8)\.\d(1,8)',stock_price)
+                            stock_price = re.search(r'(\d(1,8)\.\d(1,8))',stock_price)
                             stock_price = float(stock_price.group(1))
+                            # stock_price = float(source.split('</span></span> <span class="up_g time_rtq_content">')[0].split('">')[-1])
+                            # print "Hui's split!!!!!!!:", stock_price
                         except Exception as ex131:
-                            print "ticker:", ticker, "problem ex131:", str(ex131)
+                            print "ticker:", ticker, file, "problem ex131:", str(ex131)
 
-                        print "ticker:", ticker, "problem ex13:", str(ex13)
+
 
                     if not starting_stock_value:
                         starting_stock_value = stock_price
