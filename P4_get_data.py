@@ -35,7 +35,7 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
 
     ticker_list = []
 
-    for each_dir in stock_list[1:25]:
+    for each_dir in stock_list[1:]:
         print "\neach_dir:"+ each_dir
         each_file = os.listdir(each_dir)
         # print(each_file)
@@ -67,12 +67,16 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                     except Exception as ex11:
                         # print "ticker:", ticker, file, "problem ex11:", str(ex11)
                         try:
-
-                            value = float(re.search('(\d+\.\d+)', source.split(gather + ':</td>')[1].split('</td>')[0]).group(0))
+                            # print "value b4:", value
+                            try:
+                                value = float(re.search('(\d+\.\d+)', str(value)).group(0))
+                            except Exception as ex1111:
+                                print "ticker:", ticker, file, "value:", value, "problem ex1111:", str(ex1111)
+                                value = float(re.search('(\d+\.\d+)', source.split(gather + ':</td>')[1].split('</td>')[0]).group(0))
                             # print "value after:", value
                         except Exception as ex111:
                             print "ticker:", ticker, file, "value:", value, "problem ex111:", str(ex111)
-                            pass
+
 
                     try:
                         sp500_date = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
@@ -92,7 +96,7 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                         # print 'stock price:', stock_price, "ticker:", ticker
                         # time.sleep(5)
                     except Exception as ex13:
-                        # print "ticker:", ticker, file, "problem ex13:", str(ex13)
+                        # print "ticker:", ticker, file, "value:", value, "problem ex13:", str(ex13)
                         try:
                             stock_price = (source.split('</small><big><b>')[1].split('</b></big>&')[0])
                             # print "Hui's split000:", stock_price
@@ -101,7 +105,7 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                             # stock_price = float(stock_price.group(1))
 
                         except Exception as ex131:
-                            # print "ticker:", ticker, file, "problem ex131:", str(ex131)
+                            # print "ticker:", ticker, file, "value:", value, "problem ex131:", str(ex131)
                             try:
                                 # print "stock_price b4 treatment:\n", stock_price
                                 stock_price = re.search('<span id="yfs_''\D+''\d+''\D+''">''(\d+\.\d+)''</span>', source).group(0)
@@ -114,10 +118,7 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
 
 
                             except Exception as ex1311:
-                                print "ticker:", ticker, file, "problem ex1311:", str(ex1311)
-
-
-
+                                print "ticker:", ticker, file, "value:", value, "problem ex1311:", str(ex1311)
 
 
                     if not starting_stock_value:
