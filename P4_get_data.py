@@ -35,7 +35,7 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
 
     ticker_list = []
 
-    for each_dir in stock_list[1:]:
+    for each_dir in stock_list[1:25]:
         print "\neach_dir:"+ each_dir
         each_file = os.listdir(each_dir)
         # print(each_file)
@@ -67,12 +67,11 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                     except Exception as ex11:
                         # print "ticker:", ticker, file, "problem ex11:", str(ex11)
                         try:
-                            value = source.split(gather + ':</td>')[1].split('</td>')[0]
-                            # print "value b4:", value
-                            value = float(re.search('(\d+\.\d+)', value).group(0))
+
+                            value = float(re.search('(\d+\.\d+)', source.split(gather + ':</td>')[1].split('</td>')[0]).group(0))
                             # print "value after:", value
                         except Exception as ex111:
-                            # print "ticker:", ticker, file, "value:", value, "problem ex111:", str(ex111)
+                            print "ticker:", ticker, file, "value:", value, "problem ex111:", str(ex111)
                             pass
 
                     try:
