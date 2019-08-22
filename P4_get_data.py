@@ -3,7 +3,6 @@ import os
 import time
 import re
 from datetime import datetime
-
 from time import mktime
 import matplotlib
 matplotlib.use('TkAgg')
@@ -27,7 +26,8 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                                  'stock_p_change',
                                  'SP500',
                                  'sp500_p_change',
-                                 'Difference'
+                                 'Difference',
+                                 'Status'
                                  ])
 
     sp500_df = pd.read_csv('ALPHAVANTAGE-INDEX.csv', index_col = None)
@@ -35,7 +35,7 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
 
     ticker_list = []
 
-    for each_dir in stock_list[1:]:
+    for each_dir in stock_list[1:25]:
         print "\neach_dir:"+ each_dir
         each_file = os.listdir(each_dir)
         # print(each_file)
@@ -131,6 +131,11 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                     # print "stock_p_change:+++++++++++++++++++++++++", stock_p_change
                     sp500_p_change = (sp500_value - starting_sp500_value) / starting_sp500_value * 100.0
 
+                    difference = stock_p_change - sp500_p_change
+                    if difference > 0:
+                        status = "outperform"
+                    else:
+                        status = "underperform"
                     df = df.append({'Date':date_stamp,
                                     'Unix':unix_time,
                                     'Ticker':ticker,
@@ -139,7 +144,8 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                                     'stock_p_change': stock_p_change,
                                     'SP500':sp500_value,
                                     'sp500_p_change': sp500_p_change,
-                                   'Difference': stock_p_change - sp500_p_change
+                                    'Difference': difference,
+                                    'Status': status
                                     },
                                    ignore_index = True)
                 except Exception as e:
@@ -154,16 +160,20 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
             # print "checker 00000000\n", plot_df
             plot_df.set_index(['Date'], inplace = True)
             # print "checker 1111111\n",  plot_df
-
-            plot_df['Difference'].plot(label = each_ticker)
+            if plot_df['Status'][-1] == "underperform":
+                color = 'r'
+            else:
+                color = 'g'
+            plot_df['Difference'].plot(label = each_ticker, color = color)
             # plt.plot(plot_df['Difference'],label='Strategy Learner Portfolio', color='B')
             # print "checker 22222222\n", plot_df
+
             plt.legend()
         except Exception as ex2:
             print "ticker is:", each_ticker, "reason is:", str(ex2)
             pass
-    plt.savefig('Figure.png')
-    # plt.show()
+    # plt.savefig('Figure.png')
+    plt.show()
 
     save = gather.replace(' ', '').replace(')', '').replace('(', '').replace('/', '') + str('.csv')
     print "save:", save
