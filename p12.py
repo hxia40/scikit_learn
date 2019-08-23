@@ -105,7 +105,7 @@ def Key_Stats(gather=["Total Debt/Equity",
 
     ticker_list = []
 
-    for each_dir in stock_list[1:15]:
+    for each_dir in stock_list[1:]:
         # print "each_dir:", each_dir
         each_file = os.listdir(each_dir)
         ticker = each_dir.split('/Users/huixia/Documents/ScikitLearn/intraQuarter/_KeyStats/')[1]
@@ -152,6 +152,7 @@ def Key_Stats(gather=["Total Debt/Equity",
                         row = sp500_df[(sp500_df['Date'] == sp500_date)]
                         sp500_value = float(row["Adj Close"])
                     # print each_dir, file, "sp500:", sp500_value
+                    ''''''
 
                     try:
                         stock_price = float(source.split('</small><big><b>')[1].split('</b></big>')[0])
@@ -176,7 +177,7 @@ def Key_Stats(gather=["Total Debt/Equity",
                             # print('stock price',str(e),ticker,file)
                             # time.sleep(15)
 
-                    print("stock_price:",stock_price,"ticker:", ticker)
+                    # print("stock_price:",stock_price,"ticker:", ticker)
 
                     if not starting_stock_value:
                         starting_stock_value = stock_price
