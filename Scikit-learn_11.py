@@ -1,8 +1,11 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn import svm
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 from matplotlib import style
 style.use("ggplot")
+
 x = [1, 5, 1.5, 8, 1, 9]
 y = [2,8,1.8, 8, 0.6, 11]
 
@@ -36,4 +39,5 @@ h0 =plt.plot(xx, yy, 'k-', label = 'non weighted div')
 
 plt.scatter(X[:, 0], X[:, 1], c = Y)
 plt.legend()
-plt.show()
+plt.savefig('Figure_11.png')
+# plt.show()
