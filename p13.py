@@ -47,6 +47,7 @@ def Build_Data_Set(FEATURES =  ['DE Ratio',
     data_df = pd.DataFrame.from_csv("key_stats.csv")
     # print data_df
     # data_df = data_df[:1000]
+    data_df = data_df.reindex(np.random.permutation(data_df.index))
 
     X = np.array(data_df[FEATURES].values)#.tolist())
 
@@ -60,7 +61,7 @@ def Build_Data_Set(FEATURES =  ['DE Ratio',
     return X, y
 
 def Analysis():
-    test_size = 500
+    test_size = 1000
     X, y = Build_Data_Set()
     print len(X)
     # print X
@@ -95,5 +96,13 @@ def Analysis():
     # plt.legend()
     # plt.savefig('Figure_13.png')
     # plt.show()
+
+# def Randomizing():
+#     df = pd.DataFrame({"D1" : range(5), "D2":range(5)})
+#     print df
+#     df2 = df.reindex(np.random.permutation(df.index))
+#     print df2
+#
+# Randomizing()
 
 Analysis()
