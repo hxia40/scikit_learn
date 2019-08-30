@@ -101,7 +101,9 @@ def Key_Stats(gather=["Total Debt/Equity",
                                'Status'])
 
     sp500_df = pd.DataFrame.from_csv('ALPHAVANTAGE-INDEX.csv', index_col = None)
+    stock_df = pd.DataFrame.from_csv('stock_prices.csv', index_col = None)
     # print sp500_df['Date']
+    # print stock_df['Date']
 
     ticker_list = []
 
@@ -111,8 +113,8 @@ def Key_Stats(gather=["Total Debt/Equity",
         ticker = each_dir.split('/Users/huixia/Documents/ScikitLearn/intraQuarter/_KeyStats/')[1]
         ticker_list.append(ticker)
 
-        starting_stock_value = False
-        starting_sp500_value = False
+        # starting_stock_value = False
+        # starting_sp500_value = False
 
         if len(each_file) > 0:
             for file in each_file:
@@ -138,6 +140,7 @@ def Key_Stats(gather=["Total Debt/Equity",
                             value_list.append(value)
 
                         except Exception as e:
+
                             value = "N/A"
                             value_list.append(value)
 
@@ -148,44 +151,60 @@ def Key_Stats(gather=["Total Debt/Equity",
                         sp500_value = float(row["Adj Close"])
                         # print "==================="
                     except:
-                        sp500_date = datetime.fromtimestamp(unix_time - 259200).strftime('%Y-%m-%d')
-                        row = sp500_df[(sp500_df['Date'] == sp500_date)]
-                        sp500_value = float(row["Adj Close"])
+                        try:
+                            sp500_date = datetime.fromtimestamp(unix_time - 259200).strftime('%Y-%m-%d')
+                            row = sp500_df[(sp500_df['Date'] == sp500_date)]
+                            sp500_value = float(row["Adj Close"])
+                        except Exception as e:
+                            print "sp500_value exception", str(e)
                     # print each_dir, file, "sp500:", sp500_value
-                    ''''''
+
+                    one_year_later = int(unix_time + 31536000)
 
                     try:
-                        stock_price = float(source.split('</small><big><b>')[1].split('</b></big>')[0])
+                        sp500_1y = datetime.fromtimestamp(one_year_later).strftime('%Y-%m-%d')
+                        row = sp500_df[(sp500_df['Date'] == sp500_1y)]
+                        # print "row good", row, sp500_1y
+                        sp500_1y_value = float(row["Adj Close"])
+
                     except Exception as e:
-                        #    <span id="yfs_l10_afl">43.27</span>
                         try:
-                            stock_price = (source.split('</small><big><b>')[1].split('</b></big>')[0])
-                            stock_price = re.search(r'(\d{1,8}\.\d{1,8})', stock_price)
-                            stock_price = float(stock_price.group(1))
+                            sp500_1y = datetime.fromtimestamp(one_year_later-259200).strftime('%Y-%m-%d')
+                            row = sp500_df[(sp500_df['Date'] == sp500_1y)]
+                            sp500_1y_value = float(row["Adj Close"])
 
-                            # print(stock_price)
                         except Exception as e:
-                            try:
-                                stock_price = (source.split('<span class="time_rtq_ticker">')[1].split('</span>')[0])
-                                stock_price = re.search(r'(\d{1,8}\.\d{1,8})', stock_price)
-                                stock_price = float(stock_price.group(1))
-                            except Exception as e:
-                                print(str(e), 'a;lsdkfh', file, ticker)
+                            print "sp500 exception:", str(e)
+                    try:
+                        stock_price_1y = datetime.fromtimestamp(one_year_later).strftime('%Y-%m-%d')
+                        row = stock_df[(stock_df['Date'] == stock_price_1y)][ticker.upper()]
+                        print "row", row, stock_price_1y
+                        stock_1y_value = round(float(row), 2)
 
-                            # print('Latest:',stock_price)
+                        # time.sleep(5)
+                    except Exception as e:
+                        try:
+                            stock_price_1y = datetime.fromtimestamp(one_year_later-259200).strftime('%Y-%m-%d')
+                            print "ticker:", ticker
+                            row = stock_df[(stock_df['Date'] == stock_price_1y)][ticker.upper()]
+                            stock_1y_value = round(float(row), 2)
+                        except Exception as e:
+                            print "1 yr later stock exception:", str(e)
 
-                            # print('stock price',str(e),ticker,file)
-                            # time.sleep(15)
+                    try:
+                        stock_price = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
+                        row = stock_df[(stock_df['Date'] == stock_price)][ticker.upper()]
+                        stock_price = round(float(row), 2)
+                    except Exception as e:
+                        try:
+                            stock_price = datetime.fromtimestamp(unix_time-259200).strftime('%Y-%m-%d')
+                            row = stock_df[(stock_df['Date'] == stock_price)][ticker.upper()]
+                            stock_price = round(float(row), 2)
+                        except Exception as e:
+                            print " stock price exception:", str(e)
 
-                    # print("stock_price:",stock_price,"ticker:", ticker)
-
-                    if not starting_stock_value:
-                        starting_stock_value = stock_price
-                    if not starting_sp500_value:
-                        starting_sp500_value = sp500_value
-
-                    stock_p_change = ((stock_price - starting_stock_value) / starting_stock_value) * 100
-                    sp500_p_change = ((sp500_value - starting_sp500_value) / starting_sp500_value) * 100
+                    stock_p_change = round((((stock_1y_value - stock_price) / stock_price) * 100), 2)
+                    sp500_p_change = round((((sp500_1y_value - sp500_value) / sp500_value) * 100), 2)
 
                     difference = stock_p_change - sp500_p_change
 
@@ -248,7 +267,7 @@ def Key_Stats(gather=["Total Debt/Equity",
                 except Exception as e:
                     pass
 
-    df.to_csv("key_stats.csv")
+    df.to_csv("key_stats_acc_perf_NO_NA.csv")
 
 
 Key_Stats()

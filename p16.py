@@ -49,6 +49,7 @@ def Stock_Prices():
                 df = pd.concat([df, data[ticker.upper()]], axis=1)
             except Exception as e11:
                 print "error e11:", str(e11)
+    df.index.names = ['Date']
     df.to_csv("stock_prices.csv")
 
 
